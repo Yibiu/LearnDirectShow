@@ -206,15 +206,38 @@ if (hr == S_OK) {
             (void **)&pPropBag);
         if (SUCCEEDED(hr))
         {
-            // To retrieve the filter's friendly name, do the following:
-            VARIANT varName;
-            VariantInit(&varName);
-            hr = pPropBag->Read(L"FriendlyName", &varName, 0);
-            if (SUCCEEDED(hr))
-            {
-                // Display the name in your UI somehow.
-            }
-            VariantClear(&varName);
+             VARIANT var;
+        	VariantInit(&var);
+
+        	// Get description or friendly name.
+        	hr = pPropBag->Read(L"Description", &var, 0);
+        	if (FAILED(hr))
+        	{
+         		hr = pPropBag->Read(L"FriendlyName", &var, 0);
+        	}
+        	if (SUCCEEDED(hr))
+        	{
+            	printf("%S\n", var.bstrVal);
+            	VariantClear(&var); 
+        	}
+
+        	hr = pPropBag->Write(L"FriendlyName", &var);
+
+        	// WaveInID applies only to audio capture devices.
+        	hr = pPropBag->Read(L"WaveInID", &var, 0);
+        	if (SUCCEEDED(hr))
+        	{
+            	printf("WaveIn ID: %d\n", var.lVal);
+            	VariantClear(&var); 
+        	}
+
+        	hr = pPropBag->Read(L"DevicePath", &var, 0);
+        	if (SUCCEEDED(hr))
+        	{
+            	// The device path is not intended for display.
+            	printf("Device path: %S\n", var.bstrVal);
+            	VariantClear(&var); 
+        	}
 
             // To create an instance of the filter, do the following:
             IBaseFilter *pFilter;
@@ -230,6 +253,17 @@ if (hr == S_OK) {
 }
 pSysDevEnum->Release();
 ```
+
+> CLSID_VideoCompressorCategory表示枚举的设备类型，根据需要修改。例如：CLSID_AudioInputDeviceCategory，CLSID_VideoInputDeviceCategory等。
+
+每个IMoniker的IPropertyBag包含的内容如下：
+
+| Property       | Description                                                  | VARIANT Type |
+| -------------- | ------------------------------------------------------------ | ------------ |
+| "FriendlyName" | The name of the device.                                      | **VT_BSTR**  |
+| "Description"  | A description of the device.                                 | **VT_BSTR**  |
+| "DevicePath"   | A unique string that identifies the device. (Video capture devices only.) | **VT_BSTR**  |
+| "WaveInID"     | The identifier for an audio capture device. (Audio capture devices only.) | **VT_I4**    |
 
 ### 3.2 Filter Mapper枚举
 
