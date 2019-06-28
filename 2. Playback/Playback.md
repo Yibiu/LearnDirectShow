@@ -35,3 +35,11 @@ Playback使用Filter Graph建立，不借助Capture Graph Builder接口。
 
 
 
+
+
+reference：
+
+[Audio/Video Playback in DirectShow](https://docs.microsoft.com/zh-cn/windows/desktop/DirectShow/audio-video-playback-in-directshow)
+
+
+
